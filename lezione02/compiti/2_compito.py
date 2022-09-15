@@ -1,77 +1,57 @@
-# Immaginiamo di dover creare un registro di utenti per un Casinò. 
-# Creare uno script che chieda da terminale i dati di `N` utenti (`N` è una variabile) 
-# e salvare ogni utente in un dizionario. 
-# I dizionari relativi ad ogni utente devono essere contenuti in una lista. 
-# Il programma deve rifiutare una inserizione (e terminare) se il nickname di uno degli 
-# utenti è già presente nel sistema. Non terminare il programma usando la funzione `exit()`
-# ma assicurarsi che sia il flow del programma a gestire questo caso.  
-
-# I dati dell'utente sono:
-# - `Nickname`
-# - `Eta`
-# - `Gender` (per semplicità solo `M` o `F`)
-
-print("--Benvenuti al GambleTme Casinó--\n\n")
-
-n = int(input("Quanti account vuoi registrare oggi? "))
+users_number = 5
 users = []
-users_nicks = []
+current_user = 1
 
-for i in range(n):
-# Dobbiamo creare una lista di dizionari con all'interno i valori ddati dall'input (list > dict > input )\
-    nickname = input("Inserire nickname per account {}°: ".format(i+1))
+while len(users) < users_number:
+    nickname = input(f"Insert nickname for user #{current_user}: ")
+    age = input(f"Insert age for user #{current_user}: ")
+    gender = input(f"Insert gender for user #{current_user}: ")
 
-    while nickname in users_nicks:
-        print("Accesso Negato. Nickname giá esistente")
-        nickname = input("Inserire nickname per account {}°: ".format(i+1))
-    users_nicks.append(nickname)     
+    user = { "nickname" : nickname, "age" : age, "gender" : gender}
 
-    eta = int(input("Inserire l'etá dell'account {}°: ".format(i+1)))
-    gender = input("Inserire il gender dell'account {}°: ".format(i+1)).capitalize()
-    games = input("Inserire i giochi preferiti divisi da virgola dell'account {}°: ".format(i+1)).split(",")
+    if user not in users:
+        print(f"Added user #{current_user}")
+        current_user += 1
+        users.append(user)
+    else:
+        print("User already defined! Exiting program...")
+        break
 
-    for i in range(len(games)):
-        games[i] = games[i].strip()
+genders_in_users = {}
+total_ages_in_users = 0
+total_names_length_in_users = 0
 
-    new_user = {"nickname" : nickname, "etá" : eta, "gender" : gender , "giochi": games}
-    users.append(new_user)
-    print("\n\n Utente {}° inserito! \n\n".format(i+1))
-
-print("\n Inserimento completato! \n A seguire qualche informazione riguardo gli account creati:")
-print("Hai inserito {} account.".format(len(users)))
-eta = []
-gender = []
+age_min = 10000000000
+age_max = 0
 
 for user in users:
-    eta.append(user["etá"])
-    gender.append(user["gender"])
 
-gender_f = 0
-for one_gender in gender:
-    if one_gender == 'F':
-        gender_f +=1
+    if user["gender"] == "M":
+        if "M" in genders_in_users.keys():
+            genders_in_users["M"] += 1
+        else:
+            genders_in_users["M"] = 1
+    else:
+        if "F" in genders_in_users.keys():
+            genders_in_users["F"] += 1
+        else:
+            genders_in_users["F"] = 1
 
-sum_eta = 0
-for one_eta in eta:
-    sum_eta += one_eta
+    user_age = int(user['age'])
 
+    if user_age < age_min:
+        age_min = user_age
 
-print("L'etá media é di {:.2f} anni.".format(sum_eta/len(users)))
-print("Hai inserito {} accounts di gender femminile.".format(gender_f))
+    if user_age > age_max:
+        age_max = user_age
 
-# ora come feedback mostreremo il min e il max dell'etá degli users (senza le formule incluse in python)
-mini= eta[0]
-for x in eta:
-    if x < mini:
-        mini = x
-print("L'etá minima é di {:.2f} anni.".format(mini))
+    total_ages_in_users += user_age
 
-maxi= eta[0]
-for x in eta:
-    if x > maxi:
-        maxi = x
-print("L'etá massima é di {:.2f} anni.".format(maxi))
+    total_names_length_in_users += int(len(user["nickname"]))
 
-
-
-# creare una struttura dati che contenga il numero di preferenze associato ad ogni gioco
+print(f"Males: {genders_in_users['M']}")
+print(f"Females: {genders_in_users['F']}")
+print(f"Min age: {age_min}")
+print(f"Max age: {age_max}")
+print(f"Average age: {total_ages_in_users / len(users)} ")
+print(f"Average nickname length: {total_names_length_in_users / len(users)}")
