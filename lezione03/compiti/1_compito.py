@@ -1,91 +1,92 @@
-from prettytable import PrettyTable
-
-# First we think about the inputs
-
-table = PrettyTable()
-table.field_names = ["Qualcosaltro", "#"]
-
-words_list = []
+puntuaction_marks = { ".", "!", "?" }
 comma = ","
-marks = ["!", ".", "?"]
+ending_keyword = "stop"
 
-# Ask words 
-word = input("Insert first word: ")
+words_and_marks = []
+text = ""
+current_sentence = ""
+sentences = []
+total_words = 0
+total_marks = 0
+characters = {}
+least_frequent_chars = []
+most_frequent_chars = []
+least_frequent_char_frequency = 1000000000
+most_frequent_char_frequency = 0
 
-while word != "stop": 
-    words_list.append(word)
-    word = input("Insert another word: ")
+print("\nType in one word at the time forming some sentences.")
+print("Separate sentences with punctuation marks ( . ! ? ). You can use commas ( , ). To end type \"stop\"\n")
 
-words_list = ["hello", ",", "I", "am", "G", "!", "and", "you", "amigo","?"]
+while text != ending_keyword:
 
-#generating the sentences list
-sentence = ""
-sentence_joint = []
+    text = input("Add a word, type \"stop\" to end: ")
 
-for element in words_list:
-    if element in marks:
-        sentence = sentence.strip()
-        sentence = sentence.replace(sentence[0], sentence[0].upper(), 1)
-        sentence_joint.append(sentence + element)
-        
-        sentence = ""
-    elif element == comma:
-        sentence += comma
-    else:
-        sentence += " " + element 
+    words_and_marks.append(text)
 
-#add trailing sentence
-if sentence != "":
-    sentence = sentence.strip()
-    sentence = sentence.replace(sentence[0], sentence[0].upper(), 1)
-    sentence_joint.append(sentence)
+# words_and_marks = ["ciao", ",", "mi", "chiamo", "Claudio", "!", "tu", "come", "ti", "chiami", "?", "ah", ",", "mi", "fa", "piacere"]
 
-full_sentences = "\n".join(sentence_joint)
+for index, text in enumerate(words_and_marks):
 
-# print sentence
-print(full_sentences)
+    for char in text:
 
-#statistics
-#number of words
-only_words = []
+        char = char.lower()
 
-for word in words_list:
-    if word not in marks and word != comma:
-        only_words.append(word)
-
-# this could also have been made with a list comprehension, that can be learnt in lesson 4
-# as an example:
-# only_words = [word for word in words_list if word not in marks and word != comma]
-
-table.add_row(["Total number of words given: ", len(only_words)])
-table.add_row(["Number of marks: ", len(words_list)-len(only_words)])
-table.add_row(["Number of marks: ", len(sentence_joint)])
-
-
-#finding most and least frequent character
-letters_dict = {}
-for char in full_sentences.lower():
-    if char not in ["\n", " "]:
-        if char in letters_dict:
-            letters_dict[char] += 1
+        if char in characters.keys():
+            characters[char] += 1
         else:
-            letters_dict[char] = 1
+            characters[char] = 1
 
- #table.add_row(["Following the most and least frequent character: ", letters_dict])
+    if text in puntuaction_marks:
 
-max_char_count = max(letters_dict.values())
-min_char_count = min(letters_dict.values())
+        current_sentence += text
 
-max_chars = []
-min_chars = []
+        sentences.append(current_sentence)
 
-for k, v in letters_dict.items():
-    if v == max_char_count:
-        max_chars.append(k)
-    if v == min_char_count:
-        min_chars.append(k)
+        current_sentence = ""
 
-table.add_row(["The most frequent ({}) character/s: ".format(max_char_count), ", ".join(max_chars)])
-table.add_row(["The least frequent ({}) character/s: ".format(min_char_count), ", ".join(min_chars)])
+        total_marks += 1
 
-print(table)
+    elif text == comma:
+
+        current_sentence += text
+
+        total_marks += 1
+
+    else:
+
+        if current_sentence == "":
+
+            current_sentence += text.capitalize()
+
+        else:
+            
+            current_sentence += " " + text
+                
+            if index == len(words_and_marks) - 1:
+                sentences.append(current_sentence)
+            
+        total_words += 1
+
+for index, sentence in enumerate(sentences):
+    print(f"Sentence {index + 1}: \"{sentence}\"")
+
+for frequency in characters.values():
+    if frequency < least_frequent_char_frequency:
+        least_frequent_char_frequency = frequency
+
+    if frequency > most_frequent_char_frequency:
+        most_frequent_char_frequency = frequency
+
+for char, frequency in characters.items():
+    if frequency == most_frequent_char_frequency:
+        most_frequent_chars.append(char)
+
+    if frequency == least_frequent_char_frequency:
+        least_frequent_chars.append(char)
+
+print(f"\nReceived {total_words} words.")
+print(f"Received {total_marks} marks.")
+print(f"Received {len(sentences)} sentences.")
+print(f"Most frequent chars {most_frequent_chars} with a frequency of {most_frequent_char_frequency}")
+print(f"Least frequent chars {least_frequent_chars} with a frequency of {least_frequent_char_frequency}")
+        
